@@ -1,0 +1,18 @@
+Frontend
+React.js 
+HTML 
+CSS 
+Vite (for development server)
+Backend
+Python 
+Flask Framework 
+Development Tools
+Visual Studio Code 
+Git & GitHub
+Libraries & Tools
+Requests (for API calls) 
+jsPDF (for PDF generation) 
+jspdf-autotable (for table in PDF) 
+APIs & Data Sources
+ORCID API 
+OpenAlex API 
