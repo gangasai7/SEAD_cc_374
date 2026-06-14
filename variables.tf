@@ -1,0 +1,20 @@
+variable "aws_region" {
+  default = "ap-south-1"
+}
+
+variable "instance_type" {
+  default = "t3.micro"
+}
+
+variable "key_name" {
+  description = "AWS Key Pair Name"
+}
+
+variable "db_username" {
+  default = "admin"
+}
+
+variable "db_password" {
+  description = "RDS Password"
+  sensitive   = true
+}
