@@ -20,6 +20,9 @@ spec:
         app: frontend
 
     spec:
+      imagePullSecrets:
+        - name: ecr-secret
+
       containers:
         - name: frontend
 
