@@ -23,7 +23,7 @@ spec:
       containers:
         - name: frontend
 
-          image: <178042201905.dkr.ecr.ap-south-1.amazonaws.com/research-frontend>:latest
+          image: 178042201905.dkr.ecr.ap-south-1.amazonaws.com/research-frontend:latest
 
           imagePullPolicy: Always
 

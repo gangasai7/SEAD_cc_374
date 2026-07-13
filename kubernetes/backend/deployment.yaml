@@ -23,7 +23,7 @@ spec:
       containers:
         - name: backend
 
-          image: <178042201905.dkr.ecr.ap-south-1.amazonaws.com/research-backend>:latest
+          image: 178042201905.dkr.ecr.ap-south-1.amazonaws.com/research-backend:latest
 
           imagePullPolicy: Always
 
