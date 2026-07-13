@@ -19,23 +19,36 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          script: |
-            cd /home/ubuntu/research-project
 
+          script: |
+            set -e
+
+            if [ ! -d "/home/ubuntu/SEAD_cc_374" ]; then
+              echo "Cloning repository..."
+              git clone https://github.com/gangasai7/SEAD_cc_374.git /home/ubuntu/SEAD_cc_374
+            fi
+
+            cd /home/ubuntu/SEAD_cc_374
+
+            echo "Pulling latest code..."
             git pull origin main
 
+            echo "Logging into Amazon ECR..."
             aws ecr get-login-password --region ap-south-1 | \
             docker login \
             --username AWS \
             --password-stdin \
             178042201905.dkr.ecr.ap-south-1.amazonaws.com
 
+            echo "Applying Kubernetes manifests..."
             kubectl apply -f kubernetes/
 
+            echo "Restarting deployments..."
             kubectl rollout restart deployment/backend -n research-app
             kubectl rollout restart deployment/frontend -n research-app
 
+            echo "Waiting for rollout..."
             kubectl rollout status deployment/backend -n research-app
             kubectl rollout status deployment/frontend -n research-app
 
-            echo "Deployment Successful"
+            echo "Deployment completed successfully."
