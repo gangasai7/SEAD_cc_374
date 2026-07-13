@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: backend-config
+  namespace: research-app
+
+data:
+  APP_ENV: "production"
+  REPORT_PATH: "/app/reports"
+  LOG_LEVEL: "INFO"

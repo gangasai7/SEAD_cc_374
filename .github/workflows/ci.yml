@@ -1,0 +1,124 @@
+name: CI - Build Test and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-test-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    env:
+      AWS_REGION: ap-south-1
+      AWS_ACCOUNT_ID: 178042201905
+      FRONTEND_REPOSITORY: research-frontend
+      BACKEND_REPOSITORY: research-backend
+
+    steps:
+      ####################################################
+      # Checkout Repository
+      ####################################################
+
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      ####################################################
+      # Frontend Unit Tests
+      ####################################################
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Frontend Dependencies
+        working-directory: ./research-frontend
+        run: npm install
+
+      - name: Run Frontend Unit Tests
+        working-directory: ./research-frontend
+        run: npm test
+
+      ####################################################
+      # Backend Unit Tests
+      ####################################################
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Backend Dependencies
+        working-directory: ./research-backend
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run Backend Unit Tests
+        working-directory: ./research-backend
+        run: pytest
+
+      ####################################################
+      # Configure AWS Credentials
+      ####################################################
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      ####################################################
+      # Login to Amazon ECR
+      ####################################################
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      ####################################################
+      # Build Backend Image
+      ####################################################
+
+      - name: Build Backend Docker Image
+        run: |
+          docker build -t $BACKEND_REPOSITORY:latest ./research-backend
+
+      - name: Tag Backend Image
+        run: |
+          docker tag $BACKEND_REPOSITORY:latest \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPOSITORY:latest
+
+      - name: Push Backend Image
+        run: |
+          docker push \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$BACKEND_REPOSITORY:latest
+
+      ####################################################
+      # Build Frontend Image
+      ####################################################
+
+      - name: Build Frontend Docker Image
+        run: |
+          docker build -t $FRONTEND_REPOSITORY:latest ./research-frontend
+
+      - name: Tag Frontend Image
+        run: |
+          docker tag $FRONTEND_REPOSITORY:latest \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPOSITORY:latest
+
+      - name: Push Frontend Image
+        run: |
+          docker push \
+          $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$FRONTEND_REPOSITORY:latest
+
+      ####################################################
+      # Success Message
+      ####################################################
+
+      - name: Build Completed
+        run: echo "Unit tests passed. Docker images pushed successfully to Amazon ECR."
