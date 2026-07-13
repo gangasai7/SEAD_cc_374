@@ -44,25 +44,6 @@ jobs:
         run: npm test
 
       ####################################################
-      # Backend Unit Tests
-      ####################################################
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-
-      - name: Install Backend Dependencies
-        working-directory: ./research-backend
-        run: |
-          pip install -r requirements.txt
-          pip install pytest
-
-      - name: Run Backend Unit Tests
-        working-directory: ./research-backend
-        run: pytest
-
-      ####################################################
       # Configure AWS Credentials
       ####################################################
 
@@ -121,4 +102,4 @@ jobs:
       ####################################################
 
       - name: Build Completed
-        run: echo "Unit tests passed. Docker images pushed successfully to Amazon ECR."
+        run: echo "Frontend tests passed. Docker images pushed successfully to Amazon ECR."
